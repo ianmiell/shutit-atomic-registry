@@ -75,7 +75,17 @@ end''')
 		shutit.login(command='sudo su -',password='vagrant')
 		shutit.install('git')
 		shutit.install('docker')
-		shutit.send('git clone https://github.com/openshift/origin')
+		shutit.install('atomic')
+		shutit.install('python-dateutil')
+		shutit.send('systemctl start docker')
+		shutit.send('atomic install projectatomic/atomic-registry-install')
+		shutit.send('/var/run/setup-atomic-registry.sh atomicregistry1.vagrant.test')
+
+		# Did not work - test failed
+		#shutit.send('git clone https://github.com/openshift/origin')
+		#shutit.send('cd origin/examples/atomic-registry')
+		#shutit.send('''sed -i 's/dnf/yum/g' Makefile''')
+		#shutit.send('make all-systemd')
 		shutit.pause_point('')
 		shutit.logout()
 		shutit.logout()
@@ -89,9 +99,9 @@ To get a picture of what has been set up.''',add_final_message=True,level=loggin
 
 
 	def get_config(self, shutit):
-		shutit.get_config(self.module_id,'vagrant_image',default='centos/7')
+		shutit.get_config(self.module_id,'vagrant_image',default='esss/centos-7.1-desktop')
 		shutit.get_config(self.module_id,'vagrant_provider',default='virtualbox')
-		shutit.get_config(self.module_id,'gui',default='true')
+		shutit.get_config(self.module_id,'gui',default='false')
 		shutit.get_config(self.module_id,'memory',default='1024')
 		shutit.get_config(self.module_id,'vagrant_run_dir',default='/tmp')
 		return True
