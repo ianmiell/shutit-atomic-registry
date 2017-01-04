@@ -78,15 +78,34 @@ end''')
 		shutit.install('atomic')
 		shutit.install('python-dateutil')
 		shutit.send('systemctl start docker')
+
+		# Standard reg + origin - from: https://github.com/projectatomic/atomic-enterprise
+		# Is this the full atomic registry?
+		#
+		#shutit.send('docker run -d --name "origin" --privileged --net=host -v /:/rootfs:ro -v /var/run:/var/run:rw -v /sys:/sys:ro -v /var/lib/docker:/var/lib/docker:rw -v /var/lib/openshift/openshift.local.volumes:/var/lib/openshift/openshift.local.volumes openshift/origin start')
+		#shutit.login(command='docker exec -it origin bash')
+		#shutit.logout('oadm registry --credentials=./openshift.local.config/master/openshift-registry.kubeconfig')
+
+
+
+		# Did not work - no image - from: http://www.projectatomic.io/registry/
+		#
+		shutit.send('mkdir -p /var/lib/atomic-registry/registry')
 		shutit.send('atomic install projectatomic/atomic-registry-install')
+		shutit.send('systemctl enable --now atomic-registry-master.service')
 		shutit.send('/var/run/setup-atomic-registry.sh atomicregistry1.vagrant.test')
 
-		# Did not work - test failed
+
+
+		# Did not work - test failed - from: https://github.com/projectatomic/atomic-enterprise
+		#
 		#shutit.send('git clone https://github.com/openshift/origin')
 		#shutit.send('cd origin/examples/atomic-registry')
 		#shutit.send('''sed -i 's/dnf/yum/g' Makefile''')
 		#shutit.send('make all-systemd')
-		shutit.pause_point('')
+
+		shutit.pause_point('Do as you will!')
+
 		shutit.logout()
 		shutit.logout()
 		shutit.log('''Vagrantfile created in: ''' + shutit.cfg[self.module_id]['vagrant_run_dir'] + '/' + module_name,add_final_message=True,level=logging.DEBUG)
@@ -101,7 +120,7 @@ To get a picture of what has been set up.''',add_final_message=True,level=loggin
 	def get_config(self, shutit):
 		shutit.get_config(self.module_id,'vagrant_image',default='esss/centos-7.1-desktop')
 		shutit.get_config(self.module_id,'vagrant_provider',default='virtualbox')
-		shutit.get_config(self.module_id,'gui',default='false')
+		shutit.get_config(self.module_id,'gui',default='true')
 		shutit.get_config(self.module_id,'memory',default='1024')
 		shutit.get_config(self.module_id,'vagrant_run_dir',default='/tmp')
 		return True
@@ -115,13 +134,14 @@ To get a picture of what has been set up.''',add_final_message=True,level=loggin
 	def is_installed(self, shutit):
 		# Destroy pre-existing, leftover vagrant images.
 		shutit.run_script('''#!/bin/bash
-MODULE_NAME=shutit_atomic_registry
+MODULE_NAME=ESS
 rm -rf $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/vagrant_run/*
+set -x
 if [[ $(command -v VBoxManage) != '' ]]
 then
 	while true
 	do
-		VBoxManage list runningvms | grep ${MODULE_NAME} | awk '{print $1}' | xargs -IXXX VBoxManage controlvm 'XXX' poweroff && VBoxManage list vms | grep shutit_atomic_registry | awk '{print $1}'  | xargs -IXXX VBoxManage unregistervm 'XXX' --delete
+		VBoxManage list runningvms | grep ${MODULE_NAME} | awk '{print $NF}' | xargs -IXXX VBoxManage controlvm 'XXX' poweroff && VBoxManage list vms | grep ${MODULE_NAME} | awk '{print $NF}'  | xargs -IXXX VBoxManage unregistervm 'XXX' --delete
 		# The xargs removes whitespace
 		if [[ $(VBoxManage list vms | grep ${MODULE_NAME} | wc -l | xargs) -eq '0' ]]
 		then
