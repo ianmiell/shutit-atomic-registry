@@ -19,6 +19,9 @@ class shutit_atomic_registry(ShutItModule):
 		shutit.send('command rm -rf ' + run_dir + '/' + module_name + ' && command mkdir -p ' + run_dir + '/' + module_name + ' && command cd ' + run_dir + '/' + module_name)
 		if shutit.send_and_get_output('vagrant plugin list | grep landrush') == '':
 			shutit.send('vagrant plugin install landrush')
+		if shutit.send_and_get_output('vagrant box list | grep -w fedora25') == '':
+			shutit.send('vagrant box add fedora25 ' + vagrant_image)
+		vagrant_image = 'fedora25'
 		shutit.send('vagrant init ' + vagrant_image)
 		shutit.send_file(run_dir + '/' + module_name + '/Vagrantfile','''Vagrant.configure("2") do |config|
   config.landrush.enabled = true
@@ -73,11 +76,11 @@ end''')
 			shutit.logout()
 		shutit.login(command='vagrant ssh ' + sorted(machines.keys())[0])
 		shutit.login(command='sudo su -',password='vagrant')
-		shutit.install('git')
-		shutit.install('docker')
-		shutit.install('atomic')
-		shutit.install('python-dateutil')
-		shutit.send('systemctl start docker')
+		#shutit.install('git')
+		#shutit.install('docker')
+		#shutit.install('atomic')
+		#shutit.install('python-dateutil')
+		#shutit.send('systemctl start docker')
 
 		# Standard reg + origin - from: https://github.com/projectatomic/atomic-enterprise
 		# Is this the full atomic registry?
@@ -118,7 +121,7 @@ To get a picture of what has been set up.''',add_final_message=True,level=loggin
 
 
 	def get_config(self, shutit):
-		shutit.get_config(self.module_id,'vagrant_image',default='esss/centos-7.1-desktop')
+		shutit.get_config(self.module_id,'vagrant_image',default='https://getfedora.org/atomic/download/download-cloud-splash?file=https://download.fedoraproject.org/pub/alt/atomic/stable/Fedora-Atomic-25-20170106.0/CloudImages/x86_64/images/Fedora-Atomic-Vagrant-25-20170106.0.x86_64.vagrant-virtualbox.box')
 		shutit.get_config(self.module_id,'vagrant_provider',default='virtualbox')
 		shutit.get_config(self.module_id,'gui',default='true')
 		shutit.get_config(self.module_id,'memory',default='1024')
