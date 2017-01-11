@@ -94,9 +94,9 @@ end''')
 		# Did not work - no image - from: http://www.projectatomic.io/registry/
 		#
 		shutit.send('mkdir -p /var/lib/atomic-registry/registry')
-		shutit.send('atomic install projectatomic/atomic-registry-install')
+		shutit.send('atomic install projectatomic/atomic-registry-install ' + ip)
 		shutit.send('systemctl enable --now atomic-registry-master.service')
-		shutit.send('/var/run/setup-atomic-registry.sh atomicregistry1.vagrant.test')
+		shutit.send('/var/run/setup-atomic-registry.sh ' + ip)
 
 
 
