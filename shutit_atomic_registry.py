@@ -137,7 +137,7 @@ To get a picture of what has been set up.''',add_final_message=True,level=loggin
 	def is_installed(self, shutit):
 		# Destroy pre-existing, leftover vagrant images.
 		shutit.run_script('''#!/bin/bash
-MODULE_NAME=ESS
+MODULE_NAME=shutit_atomic_registry_
 rm -rf $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/vagrant_run/*
 set -x
 if [[ $(command -v VBoxManage) != '' ]]
