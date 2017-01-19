@@ -76,38 +76,14 @@ end''')
 			shutit.logout()
 		shutit.login(command='vagrant ssh ' + sorted(machines.keys())[0])
 		shutit.login(command='sudo su -',password='vagrant')
-		#shutit.install('git')
-		#shutit.install('docker')
-		#shutit.install('atomic')
-		#shutit.install('python-dateutil')
-		#shutit.send('systemctl start docker')
-
-		# Standard reg + origin - from: https://github.com/projectatomic/atomic-enterprise
-		# Is this the full atomic registry?
-		#
-		#shutit.send('docker run -d --name "origin" --privileged --net=host -v /:/rootfs:ro -v /var/run:/var/run:rw -v /sys:/sys:ro -v /var/lib/docker:/var/lib/docker:rw -v /var/lib/openshift/openshift.local.volumes:/var/lib/openshift/openshift.local.volumes openshift/origin start')
-		#shutit.login(command='docker exec -it origin bash')
-		#shutit.logout('oadm registry --credentials=./openshift.local.config/master/openshift-registry.kubeconfig')
-
-
 
 		# Did not work - no image - from: http://www.projectatomic.io/registry/
 		#
 		shutit.send('mkdir -p /var/lib/atomic-registry/registry')
 		shutit.send('atomic install projectatomic/atomic-registry-install ' + ip)
 		shutit.send('systemctl enable --now atomic-registry-master.service')
+		shutit.send('echo waiting 5 minutes && sleep 300')
 		shutit.send('/var/run/setup-atomic-registry.sh ' + ip)
-
-
-
-		# Did not work - test failed - from: https://github.com/projectatomic/atomic-enterprise
-		#
-		#shutit.send('git clone https://github.com/openshift/origin')
-		#shutit.send('cd origin/examples/atomic-registry')
-		#shutit.send('''sed -i 's/dnf/yum/g' Makefile''')
-		#shutit.send('make all-systemd')
-
-		shutit.pause_point('Do as you will!')
 
 		shutit.logout()
 		shutit.logout()
